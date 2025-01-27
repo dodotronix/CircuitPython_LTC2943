@@ -153,12 +153,12 @@ class LTC2943:
         self._charge_threshold_low = low 
         self._charge_threshold_high = high 
 
-    def reset_alerts(self):
+    def release(self):
         """ Send ARA message to get the info, who pulled the alert pin down """
         try:
             with I2CDevice(self.i2c_bus, 0x0C) as device:
                 msg = bytearray(1)
                 device.readinto(msg)
-                return (int.from_bytes(msg, "big") >> 1) == self.i2c_addr
+                return int.from_bytes(msg, "big") >> 1
         except:
             return 0
