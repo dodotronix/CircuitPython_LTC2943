@@ -46,7 +46,8 @@ class Prescaler:
     PRES_M4096 = 0x06
 
 class LTC2943:
-    def __init__(self, i2c_bus: I2C, addr: int = 0x64) -> None:
+    def __init__(self, i2c_bus: I2C, addr: int = 0x64, res=2e-3) -> None:
+        self.resistor = res
         self.i2c_bus = i2c_bus
         self.i2c_addr = addr
         self.i2c_device = I2CDevice(self.i2c_bus, self.i2c_addr)
@@ -113,7 +114,7 @@ class LTC2943:
     @property
     def current(self) -> float:
         """Get current in Amps."""
-        return (0.06/0.002)*((self._current_raw-0x7fff)/0x7fff)
+        return (0.06/self.resistor)*((self._current_raw-0x7fff)/0x7fff)
 
     @property
     def current_range(self):
@@ -124,7 +125,7 @@ class LTC2943:
         """Set current low and high threshold."""
 
         def tf(v):
-            return int((0x7fff*v/(0.06/0.002))+0x7fff)
+            return int((0x7fff*v/(0.06/self.resistor))+0x7fff)
 
         low, high = rg
         self._current_threshold_low  = tf(low) 
